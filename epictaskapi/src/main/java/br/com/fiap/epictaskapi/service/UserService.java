@@ -5,26 +5,29 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import br.com.fiap.epictaskapi.model.Task;
-import br.com.fiap.epictaskapi.repository.TaskRepository;
+import br.com.fiap.epictaskapi.model.User;
+import br.com.fiap.epictaskapi.repository.UserRepository;
 
 @Service
-public class TaskService {
+public class UserService {
     
     @Autowired
-    TaskRepository repository;
+    UserRepository repository;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
-    public Page<Task> listAll(Pageable pageable){
+    public Page<User> listAll(Pageable pageable){
        return repository.findAll(pageable);
     }
 
-    public void save(Task task) {
-        repository.save(task);
+    public void save(User task) {
+        repository.save(task.password(passwordEncoder.encode(task.getPassword())));
     }
 
-    public Optional<Task> getById(Long id) {
+    public Optional<User> getById(Long id) {
         return repository.findById(id);
     }
 

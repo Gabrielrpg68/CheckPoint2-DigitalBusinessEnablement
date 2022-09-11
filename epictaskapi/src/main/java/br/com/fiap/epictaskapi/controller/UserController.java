@@ -7,7 +7,6 @@ import javax.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -23,40 +22,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import br.com.fiap.epictaskapi.model.Task;
-import br.com.fiap.epictaskapi.service.TaskService;
+import br.com.fiap.epictaskapi.model.User;
+import br.com.fiap.epictaskapi.service.UserService;
 
 @RestController
-@RequestMapping("/api/task")
-public class TaskController {
-
+@RequestMapping("/api/user")
+public class UserController {
     @Autowired
-    private TaskService service;
+    private UserService service;
     
     @GetMapping
-    @Cacheable("task")
-    public Page<Task> index(@PageableDefault(size = 10) Pageable pageable){
+    public Page<User> index(@PageableDefault(size = 5) Pageable pageable){
         return service.listAll(pageable);
     }
 
     @PostMapping
     @PreAuthorize("authenticated()")
-    public ResponseEntity<Task> create(@RequestBody @Valid Task task){
-        service.save(task);
-        return ResponseEntity.status(HttpStatus.CREATED).body(task);
+    public ResponseEntity<User> create(@RequestBody @Valid User user){
+        service.save(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<Task> show(@PathVariable Long id){
+    public ResponseEntity<User> show(@PathVariable Long id){
         return ResponseEntity.of(service.getById(id));
     }
 
     @DeleteMapping("{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @CacheEvict(value = "task", allEntries = true)
+    @CacheEvict(value = "user", allEntries = true)
     public ResponseEntity<Object> destroy(@PathVariable Long id){
 
-        Optional<Task> optional = service.getById(id);
+        Optional<User> optional = service.getById(id);
 
         if(optional.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
@@ -66,22 +63,22 @@ public class TaskController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<Task> update(@PathVariable Long id, @RequestBody @Valid Task newTask){
+    public ResponseEntity<User> update(@PathVariable Long id, @RequestBody @Valid User newUser){
         // buscar a tarefa no BD
-        Optional<Task> optional = service.getById(id);
+        Optional<User> optional = service.getById(id);
 
         // verificar se existe tarefa com esse id
         if(optional.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         // atualizar os dados no objeto
-        var task = optional.get();
-        BeanUtils.copyProperties(newTask, task);
-        task.setId(id);
+        var user = optional.get();
+        BeanUtils.copyProperties(newUser, user);
+        user.setId(id);
 
         // salvar no BD
-        service.save(task);
+        service.save(user);
 
-        return ResponseEntity.ok(task);
+        return ResponseEntity.ok(user);
     }
 }
