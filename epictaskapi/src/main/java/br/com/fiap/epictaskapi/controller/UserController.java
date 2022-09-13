@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -49,8 +48,7 @@ public class UserController {
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @CacheEvict(value = "user", allEntries = true)
+    @PreAuthorize("authenticated()")
     public ResponseEntity<Object> destroy(@PathVariable Long id){
 
         Optional<User> optional = service.getById(id);
@@ -72,7 +70,9 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
         // atualizar os dados no objeto
+        
         var user = optional.get();
+        newUser.setPassword(user.getPassword());
         BeanUtils.copyProperties(newUser, user);
         user.setId(id);
 

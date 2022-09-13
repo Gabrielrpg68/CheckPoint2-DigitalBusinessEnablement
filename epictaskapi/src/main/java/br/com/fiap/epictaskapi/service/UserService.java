@@ -23,8 +23,8 @@ public class UserService {
        return repository.findAll(pageable);
     }
 
-    public void save(User task) {
-        repository.save(task.password(passwordEncoder.encode(task.getPassword())));
+    public void save(User user) {
+        repository.save(user.password(passwordEncoder.encode(user.getPassword())));
     }
 
     public Optional<User> getById(Long id) {

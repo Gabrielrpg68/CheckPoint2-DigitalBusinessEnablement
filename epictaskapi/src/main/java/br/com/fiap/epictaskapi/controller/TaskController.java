@@ -6,8 +6,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -34,7 +32,6 @@ public class TaskController {
     private TaskService service;
     
     @GetMapping
-    @Cacheable("task")
     public Page<Task> index(@PageableDefault(size = 10) Pageable pageable){
         return service.listAll(pageable);
     }
@@ -52,8 +49,7 @@ public class TaskController {
     }
 
     @DeleteMapping("{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    @CacheEvict(value = "task", allEntries = true)
+    @PreAuthorize("authenticated()")
     public ResponseEntity<Object> destroy(@PathVariable Long id){
 
         Optional<Task> optional = service.getById(id);

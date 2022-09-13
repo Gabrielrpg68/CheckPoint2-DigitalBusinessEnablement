@@ -31,7 +31,7 @@ public class User implements UserDetails {
     @NotBlank(message = "Email é obrigatório")
     private String email;
     @JsonProperty(access = Access.WRITE_ONLY)
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
     @ManyToMany(fetch = FetchType.EAGER)
